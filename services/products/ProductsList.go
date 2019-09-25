@@ -7,14 +7,12 @@ import (
 
 var validate = services.Validate
 
-// ProductsListRequest request Struct
 type ProductsListRequest struct {
 	Search string
 	Offset int `validate:"gte=0"`
 	Limit  int `validate:"required,gte=0"`
 }
 
-// ProductsList list service
 type ProductsList struct{}
 
 func (pL *ProductsList) Execute(data interface{}) interface{} {
@@ -29,7 +27,6 @@ func (pL *ProductsList) Execute(data interface{}) interface{} {
 	return []string{"str", "lll", "222"}[payload.Offset:lastIndex]
 }
 
-// Validate implements iface
 func (pL *ProductsList) Validate(data interface{}) error {
 	err := validate.Struct(data)
 	if err != nil {

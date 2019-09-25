@@ -1,6 +1,5 @@
 package main
 
-// Service is interface for Service Base struct
 type Service interface {
 	Validate(interface{}) error
 	Execute(interface{}) interface{}
@@ -11,12 +10,10 @@ type ServiceWithContext interface {
 	Service
 }
 
-// ServiceRunner wraps Service
 type ServiceRunner struct {
 	service Service
 }
 
-// Run runs service
 func (s *ServiceRunner) Run(data interface{}) (interface{}, error) {
 	if err := s.service.Validate(data); err != nil {
 		return nil, err

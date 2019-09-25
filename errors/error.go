@@ -2,7 +2,6 @@ package errors
 
 import "fmt"
 
-// Error is a custom error type for better errors
 type Error struct {
 	Status int    `json:"status"`
 	Reason string `json:"reason"`

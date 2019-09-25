@@ -9,7 +9,6 @@ import (
 	"github.com/YaroslavRozum/go-boilerplate/services/users"
 )
 
-// Controllers all controllers list
 type Controllers struct {
 	UsersList    http.HandlerFunc
 	ProductsList http.HandlerFunc
@@ -21,7 +20,6 @@ func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	encoder.Encode(data)
 }
 
-// CreateControllers return Controllers
 func CreateControllers() *Controllers {
 	return &Controllers{
 		UsersList: NewController(
