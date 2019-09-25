@@ -4,14 +4,15 @@ import (
 	"context"
 	"net/http"
 
+	c "github.com/YaroslavRozum/go-boilerplate/controllers"
 	"github.com/go-chi/chi"
 )
 
 func createRouter() *chi.Mux {
-	var controllers = CreateControllers()
+	controller := c.CreateController()
 	r := chi.NewRouter()
-	r.With(SessionCheck).Get("/users", controllers.UsersList)
-	r.With(SessionCheck).Get("/products", controllers.ProductsList)
+	r.With(SessionCheck).Get("/users", controller.Users.List)
+	r.With(SessionCheck).Get("/products", controller.Products.List)
 	return r
 }
 
