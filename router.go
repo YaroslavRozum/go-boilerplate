@@ -1,9 +1,6 @@
 package main
 
 import (
-	"context"
-	"net/http"
-
 	c "github.com/YaroslavRozum/go-boilerplate/controllers"
 	"github.com/go-chi/chi"
 )
@@ -11,15 +8,9 @@ import (
 func createRouter() *chi.Mux {
 	controller := c.CreateController()
 	r := chi.NewRouter()
-	r.With(SessionCheck).Get("/users", controller.Users.List)
-	r.With(SessionCheck).Get("/products", controller.Products.List)
+	sessionCheck := controller.Sessions.Check
+	r.With(sessionCheck).Get("/users", controller.Users.List)
+	r.With(sessionCheck).Get("/products", controller.Products.List)
+	r.Post("/sessions", controller.Sessions.Create)
 	return r
-}
-
-func SessionCheck(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
-		ctx := context.WithValue(r.Context(), "context", auth)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
 }

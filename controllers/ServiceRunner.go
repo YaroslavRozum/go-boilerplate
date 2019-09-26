@@ -22,8 +22,8 @@ func (s *ServiceRunner) Run(data interface{}) (interface{}, error) {
 	return response, nil
 }
 
-func NewServiceRunnerCreator(service Service) func(interface{}) Runnable {
-	return func(ctx interface{}) Runnable {
+func NewServiceRunnerCreator(service Service) func(RunnableContext) Runnable {
+	return func(ctx RunnableContext) Runnable {
 		serviceRunner := &ServiceRunner{service}
 		if serviceWithContext, ok := service.(ServiceWithContext); ok {
 			serviceWithContext.SetContext(ctx)

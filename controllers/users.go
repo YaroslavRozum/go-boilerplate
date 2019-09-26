@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/services/users"
 )
 
@@ -15,15 +16,19 @@ func CreateUsersControllers() UsersControllers {
 	return UsersControllers{
 		List: NewController(
 			NewServiceRunnerCreator(&users.UsersList{}),
-			func(r *http.Request) interface{} {
+			func(r *http.Request) (interface{}, error) {
 				query := r.URL.Query()
-				offset, _ := strconv.Atoi(query.Get("offset"))
-				limit, _ := strconv.Atoi(query.Get("limit"))
-				return &users.UsersListRequest{
+				offset, err := strconv.Atoi(query.Get("offset"))
+				limit, err := strconv.Atoi(query.Get("limit"))
+				if err != nil {
+					return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
+				}
+				requestData := &users.UsersListRequest{
 					Search: query.Get("search"),
 					Offset: offset,
 					Limit:  limit,
 				}
+				return requestData, nil
 			},
 			defaultJsonResponse,
 		),

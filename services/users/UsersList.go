@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/services"
+	"github.com/YaroslavRozum/go-boilerplate/services/sessions"
 )
 
 var validate = services.Validate
@@ -14,11 +15,11 @@ type UsersListRequest struct {
 }
 
 type UsersList struct {
-	context string
+	context *sessions.Context
 }
 
 func (uL *UsersList) SetContext(ctx interface{}) {
-	uL.context = ctx.(string)
+	uL.context = ctx.(*sessions.Context)
 }
 
 func (uL *UsersList) Execute(data interface{}) interface{} {
