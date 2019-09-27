@@ -21,7 +21,7 @@ func CreateSessionsControllers() SessionsControllers {
 		Check: func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				auth := r.Header.Get("Authorization")
-				ctxPayload, err := sessionCheck.Run(auth)
+				ctxPayload, err := sessionCheck.Execute(auth)
 				if err != nil {
 					handleError(w, err)
 					return

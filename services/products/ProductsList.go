@@ -15,7 +15,7 @@ type ProductsListRequest struct {
 
 type ProductsList struct{}
 
-func (pL *ProductsList) Execute(data interface{}) interface{} {
+func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*ProductsListRequest)
 	offset := payload.Offset
 	limit := payload.Limit
@@ -24,7 +24,7 @@ func (pL *ProductsList) Execute(data interface{}) interface{} {
 		lastIndex = 3
 	}
 
-	return []string{"str", "lll", "222"}[payload.Offset:lastIndex]
+	return []string{"str", "lll", "222"}[payload.Offset:lastIndex], nil
 }
 
 func (pL *ProductsList) Validate(data interface{}) error {

@@ -20,7 +20,7 @@ type SessionsCreateResponse struct {
 
 type SessionsCreate struct{}
 
-func (s *SessionsCreate) Execute(data interface{}) interface{} {
+func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*SessionsCreateRequest)
 	claims := &Claims{
 		Context: Context{
@@ -31,9 +31,13 @@ func (s *SessionsCreate) Execute(data interface{}) interface{} {
 		StandardClaims: jwt.StandardClaims{},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, _ := token.SignedString(settings.DefaultSettings.JwtSecret)
+	tokenString, err := token.SignedString(settings.DefaultSettings.JwtSecret)
 
-	return SessionsCreateResponse{tokenString}
+	if err != nil {
+		return nil, &errors.Error{Status: 0, Reason: err.Error()}
+	}
+
+	return SessionsCreateResponse{tokenString}, nil
 }
 
 func (pL *SessionsCreate) Validate(data interface{}) error {

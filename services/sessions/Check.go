@@ -10,7 +10,7 @@ import (
 
 type SessionsCheck struct{}
 
-func (s *SessionsCheck) Run(auth string) (*Context, error) {
+func (s *SessionsCheck) Execute(auth string) (*Context, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(auth, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

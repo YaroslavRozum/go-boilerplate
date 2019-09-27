@@ -7,19 +7,19 @@ import (
 	"github.com/YaroslavRozum/go-boilerplate/errors"
 )
 
-type Runnable interface {
+type Runner interface {
 	Run(interface{}) (interface{}, error)
 }
 
-// RunnableContext -> context from r.Context, with which you can create a Runnable (e.g you can store User in it)
+// RunnableContext -> context from r.Context, with which you can create a Runner (e.g you can store User in it)
 type RunnableContext = interface{}
-type CreateRunnable func(RunnableContext) Runnable
+type CreateRunnable func(RunnableContext) Runner
 
 // PayloadBuilder must return a data from request or error if something wrong
 type PayloadBuilder func(*http.Request) (interface{}, error)
 
 // ResponseBuilder must write to ResponseWriter data that will be passed as second argument,
-// data it is what Runnable will return from Run method
+// data it is what Runner will return from Run method
 type ResponseBuilder func(http.ResponseWriter, interface{})
 
 func handleError(w http.ResponseWriter, err error) {

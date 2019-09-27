@@ -22,7 +22,7 @@ func (uL *UsersList) SetContext(ctx interface{}) {
 	uL.context = ctx.(*sessions.Context)
 }
 
-func (uL *UsersList) Execute(data interface{}) interface{} {
+func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersListRequest)
 	offset := payload.Offset
 	limit := payload.Limit
@@ -30,7 +30,7 @@ func (uL *UsersList) Execute(data interface{}) interface{} {
 	if offset+limit > 20 {
 		lastIndex = 20
 	}
-	return []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}[payload.Offset:lastIndex]
+	return []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}[payload.Offset:lastIndex], nil
 }
 
 func (uL *UsersList) Validate(data interface{}) error {
