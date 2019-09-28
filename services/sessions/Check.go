@@ -3,7 +3,9 @@ package sessions
 import (
 	"fmt"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/errors"
+	"github.com/YaroslavRozum/go-boilerplate/models"
 	"github.com/YaroslavRozum/go-boilerplate/settings"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -20,6 +22,15 @@ func (s *SessionsCheck) Execute(auth string) (*Context, error) {
 		}
 		return settings.DefaultSettings.JwtSecret, nil
 	})
+	ctx := claims.Context
+	mapper := models.DefaultUserMapper
+	user, err := mapper.FindOne(sq.Eq{
+		"id":    ctx.ID,
+		"email": ctx.Email,
+	})
+	if user.ID != ctx.ID && user.Email != ctx.Email {
+		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+	}
 	if err != nil {
 		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}

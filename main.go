@@ -11,7 +11,8 @@ import (
 func main() {
 	settings.InitSettings()
 	defaultSettings := settings.DefaultSettings
-	err := models.InitConn()
+	err := models.InitDB()
+	models.InitModels()
 	if err != nil {
 		log.Fatal(err.Error())
 	}

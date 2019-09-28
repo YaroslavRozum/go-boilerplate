@@ -8,12 +8,12 @@ import (
 var DefaultUserMapper *UserMapper
 
 type User struct {
-	ID       string `db:"id"`
-	UserName string `db:"username"`
-	Name     string `db:"name"`
-	Email    string `db:"email"`
-	Surname  string `db:"surname"`
-	Password string `db:"password"`
+	ID       string `json:"id" db:"id"`
+	UserName string `json:"username" db:"username"`
+	Name     string `json:"name" db:"name"`
+	Email    string `json:"email" db:"email"`
+	Surname  string `json:"surname" db:"surname"`
+	Password string `json:"password,omitempty" db:"password"`
 }
 
 type UserMapper struct{}
@@ -34,18 +34,65 @@ func (uM *UserMapper) NewUser(username, name, email, surname, password string) (
 		Surname:  surname,
 	}
 
-	query, args, _ := QueryBuilder.
+	query, args, err := QueryBuilder.
 		Insert("users").
 		Columns("id", "username", "name", "email", "surname", "password").
 		Values(user.ID, user.UserName, user.Name, user.Email, user.Surname, user.Password).
 		ToSql()
 
-	_, err = Conn.Exec(query, args)
+	_, err = DB.Exec(query, args...)
 	if err != nil {
 		return nil, err
 	}
 
 	return user, nil
+}
+
+func (uM *UserMapper) FindOne(where interface{}, args ...interface{}) (*User, error) {
+	query, queryArgs, _ := QueryBuilder.
+		Select("*").
+		From("users").
+		Where(where, args...).
+		Limit(1).
+		ToSql()
+	row := DB.QueryRowx(query, queryArgs...)
+	user := &User{}
+	row.StructScan(user)
+
+	return user, nil
+}
+
+func (uM *UserMapper) FindAll(where interface{}, limit, offset uint64, args ...interface{}) ([]*User, error) {
+	selectBuilder := QueryBuilder.
+		Select("*").
+		From("users").
+		Where(where, args...)
+	if limit != 0 {
+		selectBuilder = selectBuilder.Limit(limit)
+	}
+	if offset != 0 {
+		selectBuilder = selectBuilder.Offset(offset)
+	}
+
+	query, queryArgs, _ := selectBuilder.ToSql()
+	users := []*User{}
+
+	rows, err := DB.Queryx(query, queryArgs...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		user := &User{}
+		err := rows.StructScan(&user)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func initUserMapper() {

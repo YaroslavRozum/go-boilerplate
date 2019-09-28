@@ -1,10 +1,13 @@
 package sessions
 
 import (
+	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/errors"
+	"github.com/YaroslavRozum/go-boilerplate/models"
 	"github.com/YaroslavRozum/go-boilerplate/services"
 	"github.com/YaroslavRozum/go-boilerplate/settings"
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var validate = services.Validate
@@ -22,11 +25,22 @@ type SessionsCreate struct{}
 
 func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*SessionsCreateRequest)
+
+	mapper := models.DefaultUserMapper
+	user, _ := mapper.FindOne(sq.Eq{
+		"email": payload.Email,
+	})
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(payload.Password))
+
+	if err != nil {
+		return nil, &errors.Error{Status: 0, Reason: "Wrong email or password"}
+	}
+
 	claims := &Claims{
 		Context: Context{
-			Email: payload.Email,
-			ID:    "uuid",
-			Role:  "ADMIN",
+			Email: user.Email,
+			ID:    user.ID,
 		},
 		StandardClaims: jwt.StandardClaims{},
 	}

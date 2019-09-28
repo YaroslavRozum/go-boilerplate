@@ -8,9 +8,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var Conn *sqlx.DB
+var DB *sqlx.DB
 
-func InitConn() error {
+func InitDB() error {
 	var err error
 	defaultSettings := settings.DefaultSettings
 	connectionString := fmt.Sprintf(
@@ -20,9 +20,13 @@ func InitConn() error {
 		defaultSettings.DbSslMode,
 		defaultSettings.DbPort,
 	)
-	Conn, err = sqlx.Connect("postgres", connectionString)
+	DB, err = sqlx.Connect("postgres", connectionString)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func InitModels() {
+	initUserMapper()
 }

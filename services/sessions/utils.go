@@ -7,7 +7,7 @@ import (
 type Context struct {
 	Email string `json:"email"`
 	ID    string `json:"id"`
-	Role  string `json:"role"`
+	Role  string `json:"role,omitempty"`
 }
 
 type Claims struct {
