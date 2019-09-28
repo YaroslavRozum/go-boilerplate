@@ -22,16 +22,19 @@ func (s *SessionsCheck) Execute(auth string) (*Context, error) {
 		}
 		return settings.DefaultSettings.JwtSecret, nil
 	})
+	if err != nil {
+		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+	}
 	ctx := claims.Context
 	mapper := models.DefaultUserMapper
 	user, err := mapper.FindOne(sq.Eq{
 		"id":    ctx.ID,
 		"email": ctx.Email,
 	})
-	if user.ID != ctx.ID && user.Email != ctx.Email {
+	if err != nil {
 		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
-	if err != nil {
+	if user.ID != ctx.ID && user.Email != ctx.Email {
 		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
 	if token == nil || !token.Valid {

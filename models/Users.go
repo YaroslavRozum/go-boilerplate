@@ -7,6 +7,10 @@ import (
 
 var DefaultUserMapper *UserMapper
 
+func initUserMapper() {
+	DefaultUserMapper = &UserMapper{}
+}
+
 type User struct {
 	ID       string `json:"id" db:"id"`
 	UserName string `json:"username" db:"username"`
@@ -75,17 +79,16 @@ func (uM *UserMapper) FindAll(where interface{}, limit, offset uint64, args ...i
 	}
 
 	query, queryArgs, _ := selectBuilder.ToSql()
-	users := []*User{}
 
 	rows, err := DB.Queryx(query, queryArgs...)
-
 	if err != nil {
 		return nil, err
 	}
 
+	users := []*User{}
 	for rows.Next() {
 		user := &User{}
-		err := rows.StructScan(&user)
+		err := rows.StructScan(user)
 		if err != nil {
 			return nil, err
 		}
@@ -93,8 +96,4 @@ func (uM *UserMapper) FindAll(where interface{}, limit, offset uint64, args ...i
 	}
 
 	return users, nil
-}
-
-func initUserMapper() {
-	DefaultUserMapper = &UserMapper{}
 }
