@@ -9,7 +9,8 @@ import (
 )
 
 type UsersControllers struct {
-	List http.HandlerFunc
+	List   http.HandlerFunc
+	Create http.HandlerFunc
 }
 
 func CreateUsersControllers() UsersControllers {
@@ -30,6 +31,11 @@ func CreateUsersControllers() UsersControllers {
 				}
 				return requestData, nil
 			},
+			defaultJsonResponse,
+		),
+		Create: NewController(
+			NewServiceRunnerCreator(&users.UsersCreate{}),
+			defaultPayloadBuilder(&users.UsersCreateRequest{}),
 			defaultJsonResponse,
 		),
 	}

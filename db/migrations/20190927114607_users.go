@@ -11,11 +11,26 @@ func init() {
 }
 
 func upUsers(tx *sql.Tx) error {
-	// This code is executed when the migration is applied.
+	_, err := tx.Exec(`
+	CREATE TABLE users (
+		id uuid NOT NULL PRIMARY KEY,
+		username text,
+		name text,
+		email text,
+		surname text,
+		password text
+	);
+	`)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func downUsers(tx *sql.Tx) error {
-	// This code is executed when the migration is rolled back.
+	_, err := tx.Exec("DROP TABLE users;")
+	if err != nil {
+		return err
+	}
 	return nil
 }

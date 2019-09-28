@@ -3,6 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
+
+	"github.com/YaroslavRozum/go-boilerplate/errors"
 )
 
 type Controller struct {
@@ -24,6 +27,24 @@ func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	}
 	encoder := json.NewEncoder(w)
 	encoder.Encode(res)
+}
+
+func defaultPayloadBuilder(newPayloadStruct interface{}) PayloadBuilder {
+	return func(r *http.Request) (interface{}, error) {
+		contentType := r.Header.Get("Content-Type")
+		if contentType != "application/json" {
+			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
+		}
+		decoder := json.NewDecoder(r.Body)
+		nPSV := reflect.ValueOf(newPayloadStruct)
+		nPST := nPSV.Elem().Type()
+		requestData := reflect.New(nPST).Interface()
+		err := decoder.Decode(requestData)
+		if err != nil {
+			return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
+		}
+		return requestData, nil
+	}
 }
 
 func CreateController() Controller {

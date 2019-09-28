@@ -13,7 +13,7 @@ type Runner interface {
 
 // RunnableContext -> context from r.Context, with which you can create a Runner (e.g you can store User in it)
 type RunnableContext = interface{}
-type CreateRunnable func(RunnableContext) Runner
+type CreateRunner func(RunnableContext) Runner
 
 // PayloadBuilder must return a data from request or error if something wrong
 type PayloadBuilder func(*http.Request) (interface{}, error)
@@ -33,7 +33,7 @@ func handleError(w http.ResponseWriter, err error) {
 	return
 }
 
-func NewController(cR CreateRunnable, plB PayloadBuilder, rsB ResponseBuilder) http.HandlerFunc {
+func NewController(cR CreateRunner, plB PayloadBuilder, rsB ResponseBuilder) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload, err := plB(r)
 		if err != nil {

@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
-	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/services/sessions"
 )
 
@@ -32,19 +30,7 @@ func CreateSessionsControllers() SessionsControllers {
 		},
 		Create: NewController(
 			NewServiceRunnerCreator(&sessions.SessionsCreate{}),
-			func(r *http.Request) (interface{}, error) {
-				contentType := r.Header.Get("Content-Type")
-				if contentType != "application/json" {
-					return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
-				}
-				decoder := json.NewDecoder(r.Body)
-				requestData := &sessions.SessionsCreateRequest{}
-				err := decoder.Decode(requestData)
-				if err != nil {
-					return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
-				}
-				return requestData, nil
-			},
+			defaultPayloadBuilder(&sessions.SessionsCreateRequest{}),
 			defaultJsonResponse,
 		),
 	}

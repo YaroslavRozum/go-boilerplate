@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"database/sql"
+
 	"github.com/pressly/goose"
 )
 
@@ -10,11 +11,23 @@ func init() {
 }
 
 func upProducts(tx *sql.Tx) error {
-	// This code is executed when the migration is applied.
+	_, err := tx.Exec(`
+	CREATE TABLE products (
+		id uuid NOT NULL PRIMARY KEY,
+		name text,
+		price int
+	);
+	`)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func downProducts(tx *sql.Tx) error {
-	// This code is executed when the migration is rolled back.
+	_, err := tx.Exec("DROP TABLE products;")
+	if err != nil {
+		return err
+	}
 	return nil
 }

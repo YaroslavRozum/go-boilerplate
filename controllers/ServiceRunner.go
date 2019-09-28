@@ -1,5 +1,9 @@
 package controllers
 
+import (
+	"reflect"
+)
+
 type Service interface {
 	Validate(interface{}) error
 	Execute(interface{}) (interface{}, error)
@@ -27,8 +31,11 @@ func (s *ServiceRunner) Run(data interface{}) (interface{}, error) {
 
 func NewServiceRunnerCreator(service Service) func(RunnableContext) Runner {
 	return func(ctx RunnableContext) Runner {
-		serviceRunner := &ServiceRunner{service}
-		if serviceWithContext, ok := service.(ServiceWithContext); ok {
+		sV := reflect.ValueOf(service)
+		sT := sV.Elem().Type()
+		newService := reflect.New(sT).Interface().(Service)
+		serviceRunner := &ServiceRunner{newService}
+		if serviceWithContext, ok := newService.(ServiceWithContext); ok {
 			serviceWithContext.SetContext(ctx)
 		}
 		return serviceRunner

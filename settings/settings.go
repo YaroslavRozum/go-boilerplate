@@ -1,7 +1,6 @@
 package settings
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -18,12 +17,11 @@ var DefaultSettings Settings
 
 func InitSettings() {
 	DefaultSettings = Settings{
-		JwtSecret: []byte("THIS_IS_VERY_BIG_SECRET"),
-		Port:      ":3000",
+		JwtSecret: []byte(os.Getenv("JWT_SECRET")),
+		Port:      os.Getenv("PORT"),
 		DbName:    os.Getenv("DB_NAME"),
 		DbUser:    os.Getenv("DB_USER"),
 		DbSslMode: os.Getenv("DB_SSL_MODE"),
 		DbPort:    os.Getenv("DB_PORT"),
 	}
-	fmt.Println(DefaultSettings)
 }
