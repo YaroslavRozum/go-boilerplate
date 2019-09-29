@@ -29,4 +29,5 @@ func InitDB() error {
 
 func InitModels() {
 	initUserMapper()
+	initProductMapper()
 }

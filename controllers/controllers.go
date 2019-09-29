@@ -29,16 +29,16 @@ func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	encoder.Encode(res)
 }
 
-func defaultPayloadBuilder(newPayloadStruct interface{}) PayloadBuilder {
+func defaultPayloadBuilder(payloadStruct interface{}) PayloadBuilder {
 	return func(r *http.Request) (interface{}, error) {
 		contentType := r.Header.Get("Content-Type")
 		if contentType != "application/json" {
 			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
 		}
 		decoder := json.NewDecoder(r.Body)
-		nPSV := reflect.ValueOf(newPayloadStruct)
-		nPST := nPSV.Elem().Type()
-		requestData := reflect.New(nPST).Interface()
+		plStrctT := reflect.TypeOf(payloadStruct)
+		plStrctEl := plStrctT.Elem()
+		requestData := reflect.New(plStrctEl).Interface()
 		err := decoder.Decode(requestData)
 		if err != nil {
 			return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}

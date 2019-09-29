@@ -2,29 +2,44 @@ package products
 
 import (
 	"github.com/YaroslavRozum/go-boilerplate/errors"
+	"github.com/YaroslavRozum/go-boilerplate/models"
 	"github.com/YaroslavRozum/go-boilerplate/services"
+	"github.com/YaroslavRozum/go-boilerplate/services/utils"
 )
 
 var validate = services.Validate
 
 type ProductsListRequest struct {
 	Search string
-	Offset int `validate:"gte=0"`
-	Limit  int `validate:"required,gte=0"`
+	Offset int `validate:"gte=0,omitempty"`
+	Limit  int `validate:"gte=0,omitempty"`
+}
+
+type ProductsListResponse struct {
+	Products []*models.Product `json:"products"`
 }
 
 type ProductsList struct{}
 
 func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*ProductsListRequest)
-	offset := payload.Offset
-	limit := payload.Limit
-	lastIndex := offset + limit
-	if offset+limit > 3 {
-		lastIndex = 3
+	offset := uint64(payload.Offset)
+	limit := uint64(payload.Limit)
+	mapper := models.DefaultProductMapper
+
+	products, err := mapper.FindAll(nil, limit, offset)
+	if err != nil {
+		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}
 
-	return []string{"str", "lll", "222"}[payload.Offset:lastIndex], nil
+	responseData := []*models.Product{}
+
+	for _, product := range products {
+		productToAppend := utils.DumpProduct(product)
+		responseData = append(responseData, &productToAppend)
+	}
+
+	return ProductsListResponse{responseData}, nil
 }
 
 func (pL *ProductsList) Validate(data interface{}) error {

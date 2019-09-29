@@ -26,6 +26,7 @@ type UsersCreate struct{}
 func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersCreateRequest)
 	mapper := models.DefaultUserMapper
+	emailSender := services.DefaultEmailSender
 
 	existingUser, _ := mapper.FindOne(sq.Eq{
 		"email": payload.Email,
@@ -47,7 +48,16 @@ func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	services.DefaultEmailSender.Send([]string{user.Email}, "body", struct{ Name string }{user.UserName})
+	emailsToSend := []string{user.Email}
+	templateData := map[string]string{
+		"Name": user.UserName,
+	}
+
+	emailSender.Send(
+		emailsToSend,
+		"body",
+		templateData,
+	)
 
 	dumpedUser := utils.DumpUser(user)
 
