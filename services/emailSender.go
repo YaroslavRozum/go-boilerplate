@@ -55,7 +55,6 @@ func (e *EmailSender) Send(to []string, templateName string, data interface{}) {
 }
 
 func (e *EmailSender) send(to []string, body string) {
-	fmt.Println(body)
 	err := smtp.SendMail(
 		e.Address(),
 		e.Auth,
