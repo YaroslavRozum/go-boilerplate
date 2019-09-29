@@ -11,9 +11,9 @@ type Runner interface {
 	Run(interface{}) (interface{}, error)
 }
 
-// RunnableContext -> context from r.Context, with which you can create a Runner (e.g you can store User in it)
-type RunnableContext = interface{}
-type CreateRunner func(RunnableContext) Runner
+// RunnerContext -> context from r.Context, with which you can create a Runner (e.g you can store User in it)
+type RunnerContext = interface{}
+type CreateRunner func(RunnerContext) Runner
 
 // PayloadBuilder must return a data from request or error if something wrong
 type PayloadBuilder func(*http.Request) (interface{}, error)

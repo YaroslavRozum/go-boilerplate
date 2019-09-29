@@ -85,7 +85,7 @@ func (uM *UserMapper) FindAll(where interface{}, limit, offset uint64, args ...i
 		return nil, err
 	}
 
-	users := []*User{}
+	users := initUsersByLimit(limit)
 	for rows.Next() {
 		user := &User{}
 		err := rows.StructScan(user)
@@ -96,4 +96,11 @@ func (uM *UserMapper) FindAll(where interface{}, limit, offset uint64, args ...i
 	}
 
 	return users, nil
+}
+
+func initUsersByLimit(limit uint64) []*User {
+	if limit != 0 {
+		return make([]*User, 0, limit)
+	}
+	return []*User{}
 }

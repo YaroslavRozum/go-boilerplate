@@ -4,6 +4,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/models"
+	"github.com/YaroslavRozum/go-boilerplate/services"
 	"github.com/YaroslavRozum/go-boilerplate/services/utils"
 )
 
@@ -45,6 +46,8 @@ func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	services.DefaultEmailSender.Send([]string{user.Email}, "body", struct{ Name string }{user.UserName})
 
 	dumpedUser := utils.DumpUser(user)
 
