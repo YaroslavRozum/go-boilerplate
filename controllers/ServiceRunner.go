@@ -31,9 +31,9 @@ func (s *ServiceRunner) Run(data interface{}) (interface{}, error) {
 
 func NewServiceRunnerCreator(service Service) func(RunnerContext) Runner {
 	return func(ctx RunnerContext) Runner {
-		sV := reflect.TypeOf(service)
-		sT := sV.Elem()
-		newService := reflect.New(sT).Interface().(Service)
+		sT := reflect.TypeOf(service)
+		sE := sT.Elem()
+		newService := reflect.New(sE).Interface().(Service)
 		serviceRunner := &ServiceRunner{newService}
 		if serviceWithContext, ok := newService.(ServiceWithContext); ok {
 			serviceWithContext.SetContext(ctx)
