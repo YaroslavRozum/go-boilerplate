@@ -14,7 +14,7 @@ var validate = services.Validate
 type UsersListRequest struct {
 	Search string
 	Offset uint64 `validate:"omitempty,gte=0"`
-	Limit  uint64 `validate:"omitempty,gte=0"`
+	Limit  uint64 `validate:"omitempty,gte=0,max=100"`
 }
 
 type UsersListResponse struct {

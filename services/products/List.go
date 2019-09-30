@@ -12,7 +12,7 @@ var validate = services.Validate
 type ProductsListRequest struct {
 	Search string
 	Offset uint64 `validate:"gte=0,omitempty"`
-	Limit  uint64 `validate:"gte=0,omitempty"`
+	Limit  uint64 `validate:"gte=0,omitempty,max=100"`
 }
 
 type ProductsListResponse struct {
