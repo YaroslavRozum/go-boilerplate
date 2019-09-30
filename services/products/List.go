@@ -11,8 +11,8 @@ var validate = services.Validate
 
 type ProductsListRequest struct {
 	Search string
-	Offset int `validate:"gte=0,omitempty"`
-	Limit  int `validate:"gte=0,omitempty"`
+	Offset uint64 `validate:"gte=0,omitempty"`
+	Limit  uint64 `validate:"gte=0,omitempty"`
 }
 
 type ProductsListResponse struct {
@@ -23,8 +23,8 @@ type ProductsList struct{}
 
 func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*ProductsListRequest)
-	offset := uint64(payload.Offset)
-	limit := uint64(payload.Limit)
+	offset := payload.Offset
+	limit := payload.Limit
 	productMapper := models.DefaultProductMapper
 
 	products, err := productMapper.FindAll(nil, limit, offset)

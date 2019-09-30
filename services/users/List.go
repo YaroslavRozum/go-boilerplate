@@ -13,8 +13,8 @@ var validate = services.Validate
 
 type UsersListRequest struct {
 	Search string
-	Offset int `validate:"omitempty,gte=0"`
-	Limit  int `validate:"omitempty,gte=0"`
+	Offset uint64 `validate:"omitempty,gte=0"`
+	Limit  uint64 `validate:"omitempty,gte=0"`
 }
 
 type UsersListResponse struct {
@@ -32,8 +32,8 @@ func (uL *UsersList) SetContext(data interface{}) {
 
 func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersListRequest)
-	offset := uint64(payload.Offset)
-	limit := uint64(payload.Limit)
+	offset := payload.Offset
+	limit := payload.Limit
 	userMapper := models.DefaultUserMapper
 	ctx := uL.context
 	users, err := userMapper.FindAll(sq.NotEq{"id": ctx.ID}, limit, offset)

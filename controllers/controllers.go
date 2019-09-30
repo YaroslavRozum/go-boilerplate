@@ -36,8 +36,7 @@ func defaultPayloadBuilder(payloadStruct interface{}) PayloadBuilder {
 			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
 		}
 		decoder := json.NewDecoder(r.Body)
-		plStrctT := reflect.TypeOf(payloadStruct)
-		plStrctEl := plStrctT.Elem()
+		plStrctEl := reflect.TypeOf(payloadStruct).Elem()
 		requestData := reflect.New(plStrctEl).Interface()
 		err := decoder.Decode(requestData)
 		if err != nil {

@@ -17,8 +17,8 @@ func CreateProductsControllers() ProductsControllers {
 			NewServiceRunnerCreator(&products.ProductsList{}),
 			func(r *http.Request) (interface{}, error) {
 				query := r.URL.Query()
-				offset, _ := strconv.Atoi(query.Get("offset"))
-				limit, _ := strconv.Atoi(query.Get("limit"))
+				offset, _ := strconv.ParseUint(query.Get("offset"), 10, 64)
+				limit, _ := strconv.ParseUint(query.Get("limit"), 10, 64)
 				requestData := &products.ProductsListRequest{
 					Search: query.Get("search"),
 					Offset: offset,
