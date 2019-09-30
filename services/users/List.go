@@ -4,6 +4,7 @@ import (
 	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/models"
 	"github.com/YaroslavRozum/go-boilerplate/services"
+	"github.com/YaroslavRozum/go-boilerplate/services/sessions"
 	"github.com/YaroslavRozum/go-boilerplate/services/utils"
 )
 
@@ -19,7 +20,14 @@ type UsersListResponse struct {
 	Users []*models.User `json:"users"`
 }
 
-type UsersList struct{}
+type UsersList struct {
+	context *sessions.Context
+}
+
+func (uL *UsersList) SetContext(data interface{}) {
+	ctx := data.(*sessions.Context)
+	uL.context = ctx
+}
 
 func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersListRequest)

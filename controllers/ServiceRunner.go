@@ -34,10 +34,10 @@ func NewServiceRunnerCreator(service Service) func(RunnerContext) Runner {
 		sT := reflect.TypeOf(service)
 		sE := sT.Elem()
 		newService := reflect.New(sE).Interface().(Service)
-		serviceRunner := &ServiceRunner{newService}
 		if serviceWithContext, ok := newService.(ServiceWithContext); ok {
 			serviceWithContext.SetContext(ctx)
 		}
+		serviceRunner := &ServiceRunner{newService}
 		return serviceRunner
 	}
 }
