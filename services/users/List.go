@@ -1,6 +1,7 @@
 package users
 
 import (
+	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/errors"
 	"github.com/YaroslavRozum/go-boilerplate/models"
 	"github.com/YaroslavRozum/go-boilerplate/services"
@@ -33,9 +34,9 @@ func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersListRequest)
 	offset := uint64(payload.Offset)
 	limit := uint64(payload.Limit)
-	mapper := models.DefaultUserMapper
-
-	users, err := mapper.FindAll(nil, limit, offset)
+	userMapper := models.DefaultUserMapper
+	ctx := uL.context
+	users, err := userMapper.FindAll(sq.NotEq{"id": ctx.ID}, limit, offset)
 	if err != nil {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}

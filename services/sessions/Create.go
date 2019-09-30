@@ -26,8 +26,8 @@ type SessionsCreate struct{}
 func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*SessionsCreateRequest)
 
-	mapper := models.DefaultUserMapper
-	user, _ := mapper.FindOne(sq.Eq{
+	userMapper := models.DefaultUserMapper
+	user, _ := userMapper.FindOne(sq.Eq{
 		"email": payload.Email,
 	})
 

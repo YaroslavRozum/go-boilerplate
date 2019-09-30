@@ -15,15 +15,16 @@ var DefaultEmailSender EmailSender
 var templateByType = map[string]*template.Template{}
 
 type EmailSender struct {
-	Host           string
-	Port           string
-	SenderEmail    string
-	SenderPassword string
-	Auth           smtp.Auth
+	host           string
+	port           string
+	senderEmail    string
+	senderPassword string
+	auth           smtp.Auth
+	fullAddres     string
 }
 
 func (e *EmailSender) Address() string {
-	return fmt.Sprintf("%s:%s", e.Host, e.Port)
+	return fmt.Sprintf("%s:%s", e.host, e.port)
 }
 
 func (e *EmailSender) getTemplate(templateName string) (*template.Template, error) {
@@ -56,9 +57,9 @@ func (e *EmailSender) Send(to []string, templateName string, data interface{}) {
 
 func (e *EmailSender) send(to []string, body string) {
 	err := smtp.SendMail(
-		e.Address(),
-		e.Auth,
-		e.SenderEmail,
+		e.fullAddres,
+		e.auth,
+		e.senderEmail,
 		to,
 		[]byte(body),
 	)
@@ -71,16 +72,17 @@ func (e *EmailSender) send(to []string, body string) {
 
 func InitEmailSender() {
 	DefaultEmailSender = EmailSender{
-		Host:           "smtp.gmail.com",
-		Port:           "587",
-		SenderEmail:    settings.DefaultSettings.SenderEmail,
-		SenderPassword: settings.DefaultSettings.SenderPassword,
+		host:           "smtp.gmail.com",
+		port:           "587",
+		senderEmail:    settings.DefaultSettings.SenderEmail,
+		senderPassword: settings.DefaultSettings.SenderPassword,
 	}
+	DefaultEmailSender.fullAddres = DefaultEmailSender.Address()
 	auth := smtp.PlainAuth(
 		"",
-		DefaultEmailSender.SenderEmail,
-		DefaultEmailSender.SenderPassword,
-		DefaultEmailSender.Host,
+		DefaultEmailSender.senderEmail,
+		DefaultEmailSender.senderPassword,
+		DefaultEmailSender.host,
 	)
-	DefaultEmailSender.Auth = auth
+	DefaultEmailSender.auth = auth
 }

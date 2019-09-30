@@ -26,8 +26,8 @@ func (s *SessionsCheck) Execute(auth string) (*Context, error) {
 		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
 	ctx := claims.Context
-	mapper := models.DefaultUserMapper
-	user, err := mapper.FindOne(sq.Eq{
+	userMapper := models.DefaultUserMapper
+	user, err := userMapper.FindOne(sq.Eq{
 		"id":    ctx.ID,
 		"email": ctx.Email,
 	})

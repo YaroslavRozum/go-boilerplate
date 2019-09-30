@@ -25,9 +25,9 @@ func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*ProductsListRequest)
 	offset := uint64(payload.Offset)
 	limit := uint64(payload.Limit)
-	mapper := models.DefaultProductMapper
+	productMapper := models.DefaultProductMapper
 
-	products, err := mapper.FindAll(nil, limit, offset)
+	products, err := productMapper.FindAll(nil, limit, offset)
 	if err != nil {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}

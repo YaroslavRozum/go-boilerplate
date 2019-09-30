@@ -25,10 +25,10 @@ type UsersCreate struct{}
 
 func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(*UsersCreateRequest)
-	mapper := models.DefaultUserMapper
+	userMapper := models.DefaultUserMapper
 	emailSender := services.DefaultEmailSender
 
-	existingUser, _ := mapper.FindOne(sq.Eq{
+	existingUser, _ := userMapper.FindOne(sq.Eq{
 		"email": payload.Email,
 	})
 
@@ -36,7 +36,7 @@ func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 		return nil, &errors.Error{Status: 0, Reason: "Email already taken"}
 	}
 
-	user, err := mapper.NewUser(
+	user, err := userMapper.NewUser(
 		payload.UserName,
 		payload.Name,
 		payload.Email,
