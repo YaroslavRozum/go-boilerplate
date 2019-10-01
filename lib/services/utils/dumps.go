@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/YaroslavRozum/go-boilerplate/models"
+import "github.com/YaroslavRozum/go-boilerplate/lib/models"
 
 func DumpUser(user *models.User) models.User {
 	return models.User{

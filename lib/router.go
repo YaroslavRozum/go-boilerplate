@@ -1,11 +1,11 @@
-package main
+package lib
 
 import (
-	c "github.com/YaroslavRozum/go-boilerplate/controllers"
+	c "github.com/YaroslavRozum/go-boilerplate/lib/controllers"
 	"github.com/go-chi/chi"
 )
 
-func createRouter() *chi.Mux {
+func CreateRouter() *chi.Mux {
 	controller := c.CreateController()
 	r := chi.NewRouter()
 	sessionCheck := controller.Sessions.Check

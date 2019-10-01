@@ -2,11 +2,11 @@ package users
 
 import (
 	sq "github.com/Masterminds/squirrel"
-	"github.com/YaroslavRozum/go-boilerplate/errors"
-	"github.com/YaroslavRozum/go-boilerplate/models"
-	"github.com/YaroslavRozum/go-boilerplate/services"
-	"github.com/YaroslavRozum/go-boilerplate/services/sessions"
-	"github.com/YaroslavRozum/go-boilerplate/services/utils"
+	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
+	"github.com/YaroslavRozum/go-boilerplate/lib/models"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/sessions"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/utils"
 )
 
 var validate = services.Validate

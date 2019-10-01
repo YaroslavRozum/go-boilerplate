@@ -4,8 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/YaroslavRozum/go-boilerplate/models"
-	"github.com/YaroslavRozum/go-boilerplate/services"
+	"github.com/YaroslavRozum/go-boilerplate/lib"
+	"github.com/YaroslavRozum/go-boilerplate/lib/models"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services"
 	"github.com/YaroslavRozum/go-boilerplate/settings"
 )
 
@@ -18,7 +19,7 @@ func main() {
 	}
 	models.InitModels()
 	services.InitEmailSender()
-	r := createRouter()
+	r := lib.CreateRouter()
 	log.Printf("Running server on Port %s", defaultSettings.Port)
 	http.ListenAndServe(defaultSettings.Port, r)
 }

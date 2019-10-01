@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/YaroslavRozum/go-boilerplate/services/products"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/products"
 )
 
 type ProductsControllers struct {

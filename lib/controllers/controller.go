@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/YaroslavRozum/go-boilerplate/errors"
+	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 )
 
 type Runner interface {

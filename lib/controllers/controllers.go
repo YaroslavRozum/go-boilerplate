@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/YaroslavRozum/go-boilerplate/errors"
+	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 )
 
 type Controller struct {

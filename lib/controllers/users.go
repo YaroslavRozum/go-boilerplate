@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/YaroslavRozum/go-boilerplate/services/users"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/users"
 )
 
 type UsersControllers struct {

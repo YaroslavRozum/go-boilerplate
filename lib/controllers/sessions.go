@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/YaroslavRozum/go-boilerplate/services/sessions"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/sessions"
 )
 
 type SessionsControllers struct {
