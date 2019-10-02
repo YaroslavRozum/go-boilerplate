@@ -3,50 +3,53 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 )
 
-type Runner interface {
-	Run(interface{}) (interface{}, error)
+type Controller struct {
+	Users    UsersControllers
+	Products ProductsControllers
+	Sessions SessionsControllers
 }
 
-// RunnerContext -> context from r.Context, with which you can create a Runner (e.g you can store User in it)
-type RunnerContext = interface{}
-type CreateRunner func(RunnerContext) Runner
+type response struct {
+	Status int         `json:"status"`
+	Data   interface{} `json:"data"`
+}
 
-// PayloadBuilder must return a data from request or error if something wrong
-type PayloadBuilder func(*http.Request) (interface{}, error)
-
-// ResponseBuilder must write to ResponseWriter data that will be passed as second argument,
-// data it is what Runner will return from Run method
-type ResponseBuilder func(http.ResponseWriter, interface{})
-
-func handleError(w http.ResponseWriter, err error) {
+func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	if _, ok := err.(*errors.Error); !ok {
-		w.Write([]byte(`{"status":0, "reason":"Server Error" }`))
-		return
+	res := response{
+		Status: 1,
+		Data:   data,
 	}
-	jsonError, _ := json.Marshal(err)
-	w.Write(jsonError)
-	return
+	encoder := json.NewEncoder(w)
+	encoder.Encode(res)
 }
 
-func NewController(cR CreateRunner, plB PayloadBuilder, rsB ResponseBuilder) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		payload, err := plB(r)
-		if err != nil {
-			handleError(w, err)
-			return
+func defaultPayloadBuilder(payloadStruct interface{}) PayloadBuilder {
+	return func(r *http.Request) (interface{}, error) {
+		contentType := r.Header.Get("Content-Type")
+		if contentType != "application/json" {
+			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
 		}
-		ctx := r.Context().Value("context")
-		serviceRunner := cR(ctx)
-		result, err := serviceRunner.Run(payload)
+		decoder := json.NewDecoder(r.Body)
+		plStrctEl := reflect.TypeOf(payloadStruct).Elem()
+		requestData := reflect.New(plStrctEl).Interface()
+		err := decoder.Decode(requestData)
 		if err != nil {
-			handleError(w, err)
-			return
+			return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
 		}
-		rsB(w, result)
-	})
+		return requestData, nil
+	}
+}
+
+func CreateController() Controller {
+	return Controller{
+		Users:    CreateUsersControllers(),
+		Products: CreateProductsControllers(),
+		Sessions: CreateSessionsControllers(),
+	}
 }
