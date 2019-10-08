@@ -24,7 +24,7 @@ type UsersCreateResponse struct {
 type UsersCreate struct{}
 
 func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
-	payload := data.(*UsersCreateRequest)
+	payload := data.(UsersCreateRequest)
 	userMapper := models.DefaultUserMapper
 	emailSender := services.DefaultEmailSender
 

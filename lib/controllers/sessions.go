@@ -30,7 +30,7 @@ func CreateSessionsControllers() SessionsControllers {
 		},
 		Create: NewController(
 			NewServiceRunnerCreator(&sessions.SessionsCreate{}),
-			defaultPayloadBuilder(&sessions.SessionsCreateRequest{}),
+			defaultPayloadBuilder(sessions.SessionsCreateRequest{}),
 			defaultJsonResponse,
 		),
 	}

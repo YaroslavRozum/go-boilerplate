@@ -20,7 +20,7 @@ func CreateUsersControllers() UsersControllers {
 				query := r.URL.Query()
 				offset, _ := strconv.ParseUint(query.Get("offset"), 10, 64)
 				limit, _ := strconv.ParseUint(query.Get("limit"), 10, 64)
-				requestData := &users.UsersListRequest{
+				requestData := users.UsersListRequest{
 					Search: query.Get("search"),
 					Offset: offset,
 					Limit:  limit,
@@ -31,7 +31,7 @@ func CreateUsersControllers() UsersControllers {
 		),
 		Create: NewController(
 			NewServiceRunnerCreator(&users.UsersCreate{}),
-			defaultPayloadBuilder(&users.UsersCreateRequest{}),
+			defaultPayloadBuilder(users.UsersCreateRequest{}),
 			defaultJsonResponse,
 		),
 	}

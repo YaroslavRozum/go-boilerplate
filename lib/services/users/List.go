@@ -22,16 +22,16 @@ type UsersListResponse struct {
 }
 
 type UsersList struct {
-	context *sessions.Context
+	context sessions.Context
 }
 
 func (uL *UsersList) SetContext(data interface{}) {
-	ctx := data.(*sessions.Context)
+	ctx := data.(sessions.Context)
 	uL.context = ctx
 }
 
 func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
-	payload := data.(*UsersListRequest)
+	payload := data.(UsersListRequest)
 	offset := payload.Offset
 	limit := payload.Limit
 	userMapper := models.DefaultUserMapper

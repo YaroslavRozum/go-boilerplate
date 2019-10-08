@@ -19,7 +19,7 @@ func CreateProductsControllers() ProductsControllers {
 				query := r.URL.Query()
 				offset, _ := strconv.ParseUint(query.Get("offset"), 10, 64)
 				limit, _ := strconv.ParseUint(query.Get("limit"), 10, 64)
-				requestData := &products.ProductsListRequest{
+				requestData := products.ProductsListRequest{
 					Search: query.Get("search"),
 					Offset: offset,
 					Limit:  limit,

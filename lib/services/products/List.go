@@ -16,13 +16,13 @@ type ProductsListRequest struct {
 }
 
 type ProductsListResponse struct {
-	Products []*models.Product `json:"products"`
+	Products []models.Product `json:"products"`
 }
 
 type ProductsList struct{}
 
 func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
-	payload := data.(*ProductsListRequest)
+	payload := data.(ProductsListRequest)
 	offset := payload.Offset
 	limit := payload.Limit
 	productMapper := models.DefaultProductMapper
@@ -32,11 +32,11 @@ func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}
 
-	responseData := []*models.Product{}
+	responseData := []models.Product{}
 
 	for _, product := range products {
 		productToAppend := utils.DumpProduct(product)
-		responseData = append(responseData, &productToAppend)
+		responseData = append(responseData, productToAppend)
 	}
 
 	return ProductsListResponse{responseData}, nil
