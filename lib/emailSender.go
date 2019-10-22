@@ -1,4 +1,4 @@
-package services
+package lib
 
 import (
 	"bytes"
@@ -10,11 +10,14 @@ import (
 	"github.com/YaroslavRozum/go-boilerplate/settings"
 )
 
-var DefaultEmailSender EmailSender
-
 var templateByType = map[string]*template.Template{}
 
-type EmailSender struct {
+// EmailSender => (to []string)
+type EmailSender interface {
+	Send([]string, string, interface{})
+}
+
+type emailSender struct {
 	host           string
 	port           string
 	senderEmail    string
@@ -23,11 +26,11 @@ type EmailSender struct {
 	fullAddres     string
 }
 
-func (e *EmailSender) Address() string {
+func (e *emailSender) address() string {
 	return fmt.Sprintf("%s:%s", e.host, e.port)
 }
 
-func (e *EmailSender) getTemplate(templateName string) (*template.Template, error) {
+func (e *emailSender) getTemplate(templateName string) (*template.Template, error) {
 	if t, ok := templateByType[templateName]; ok {
 		return t, nil
 	}
@@ -40,7 +43,7 @@ func (e *EmailSender) getTemplate(templateName string) (*template.Template, erro
 	return t, nil
 }
 
-func (e *EmailSender) Send(to []string, templateName string, data interface{}) {
+func (e *emailSender) Send(to []string, templateName string, data interface{}) {
 	t, err := e.getTemplate(templateName)
 	if err != nil {
 		log.Printf("Parsing template error %s", err.Error())
@@ -55,7 +58,7 @@ func (e *EmailSender) Send(to []string, templateName string, data interface{}) {
 	e.send(to, body)
 }
 
-func (e *EmailSender) send(to []string, body string) {
+func (e *emailSender) send(to []string, body string) {
 	err := smtp.SendMail(
 		e.fullAddres,
 		e.auth,
@@ -70,19 +73,20 @@ func (e *EmailSender) send(to []string, body string) {
 	}
 }
 
-func InitEmailSender() {
-	DefaultEmailSender = EmailSender{
+func NewEmailSender(settings settings.Settings) EmailSender {
+	newEmailSender := emailSender{
 		host:           "smtp.gmail.com",
 		port:           "587",
-		senderEmail:    settings.DefaultSettings.SenderEmail,
-		senderPassword: settings.DefaultSettings.SenderPassword,
+		senderEmail:    settings.SenderEmail,
+		senderPassword: settings.SenderPassword,
 	}
-	DefaultEmailSender.fullAddres = DefaultEmailSender.Address()
+	newEmailSender.fullAddres = newEmailSender.address()
 	auth := smtp.PlainAuth(
 		"",
-		DefaultEmailSender.senderEmail,
-		DefaultEmailSender.senderPassword,
-		DefaultEmailSender.host,
+		newEmailSender.senderEmail,
+		newEmailSender.senderPassword,
+		newEmailSender.host,
 	)
-	DefaultEmailSender.auth = auth
+	newEmailSender.auth = auth
+	return &newEmailSender
 }

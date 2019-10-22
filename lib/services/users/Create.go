@@ -2,10 +2,11 @@ package users
 
 import (
 	sq "github.com/Masterminds/squirrel"
+	"github.com/YaroslavRozum/go-boilerplate/lib"
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 	"github.com/YaroslavRozum/go-boilerplate/lib/models"
-	"github.com/YaroslavRozum/go-boilerplate/lib/services"
 	"github.com/YaroslavRozum/go-boilerplate/lib/services/utils"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type UsersCreateRequest struct {
@@ -21,12 +22,16 @@ type UsersCreateResponse struct {
 	User models.User `json:"user"`
 }
 
-type UsersCreate struct{}
+type UsersCreate struct {
+	mappers     models.Mappers
+	emailSender lib.EmailSender
+	validate    *validator.Validate
+}
 
 func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(UsersCreateRequest)
-	userMapper := models.DefaultUserMapper
-	emailSender := services.DefaultEmailSender
+	userMapper := uC.mappers.UserMapper
+	emailSender := uC.emailSender
 
 	existingUser, _ := userMapper.FindOne(sq.Eq{
 		"email": payload.Email,
@@ -65,7 +70,7 @@ func (uC *UsersCreate) Execute(data interface{}) (interface{}, error) {
 }
 
 func (uC *UsersCreate) Validate(data interface{}) error {
-	err := validate.Struct(data)
+	err := uC.validate.Struct(data)
 	if err != nil {
 		return &errors.Error{Status: 0, Reason: err.Error()}
 	}

@@ -15,10 +15,8 @@ type Settings struct {
 	SenderPassword string
 }
 
-var DefaultSettings Settings
-
-func InitSettings() {
-	DefaultSettings = Settings{
+func CreateSettings() Settings {
+	return Settings{
 		JwtSecret:      []byte(os.Getenv("JWT_SECRET")),
 		Port:           os.Getenv("PORT"),
 		DbName:         os.Getenv("DB_NAME"),

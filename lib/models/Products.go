@@ -1,9 +1,15 @@
 package models
 
-var DefaultProductMapper *ProductMapper
+import (
+	"github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
+)
 
-func initProductMapper() {
-	DefaultProductMapper = &ProductMapper{}
+func newProductMapper(
+	queryBuilder squirrel.StatementBuilderType,
+	db *sqlx.DB,
+) *ProductMapper {
+	return &ProductMapper{queryBuilder, db}
 }
 
 type Product struct {
@@ -12,10 +18,13 @@ type Product struct {
 	Price int    `json:"price" db:"price"`
 }
 
-type ProductMapper struct{}
+type ProductMapper struct {
+	queryBuilder squirrel.StatementBuilderType
+	db           *sqlx.DB
+}
 
-func (uM *ProductMapper) FindAll(where interface{}, limit, offset uint64, args ...interface{}) ([]*Product, error) {
-	selectBuilder := QueryBuilder.
+func (pM *ProductMapper) FindAll(where interface{}, limit, offset uint64, args ...interface{}) ([]*Product, error) {
+	selectBuilder := pM.queryBuilder.
 		Select("*").
 		From("products").
 		Where(where, args...)
@@ -28,7 +37,7 @@ func (uM *ProductMapper) FindAll(where interface{}, limit, offset uint64, args .
 
 	query, queryArgs, _ := selectBuilder.ToSql()
 
-	rows, err := DB.Queryx(query, queryArgs...)
+	rows, err := pM.db.Queryx(query, queryArgs...)
 	if err != nil {
 		return nil, err
 	}

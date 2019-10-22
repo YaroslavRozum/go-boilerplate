@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/YaroslavRozum/go-boilerplate/lib/runner"
 	"github.com/YaroslavRozum/go-boilerplate/lib/services/users"
 )
 
@@ -12,10 +13,10 @@ type UsersControllers struct {
 	Create http.HandlerFunc
 }
 
-func CreateUsersControllers() UsersControllers {
+func CreateUsersControllers(u users.Services) UsersControllers {
 	return UsersControllers{
-		List: NewController(
-			NewServiceRunnerCreator(&users.UsersList{}),
+		List: runner.NewController(
+			runner.NewServiceRunnerCreator(u.List),
 			func(r *http.Request) (interface{}, error) {
 				query := r.URL.Query()
 				offset, _ := strconv.ParseUint(query.Get("offset"), 10, 64)
@@ -29,8 +30,8 @@ func CreateUsersControllers() UsersControllers {
 			},
 			defaultJsonResponse,
 		),
-		Create: NewController(
-			NewServiceRunnerCreator(&users.UsersCreate{}),
+		Create: runner.NewController(
+			runner.NewServiceRunnerCreator(u.Create),
 			defaultPayloadBuilder(users.UsersCreateRequest{}),
 			defaultJsonResponse,
 		),

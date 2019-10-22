@@ -1,12 +1,11 @@
-package lib
+package router
 
 import (
-	c "github.com/YaroslavRozum/go-boilerplate/lib/controllers"
+	"github.com/YaroslavRozum/go-boilerplate/lib/controllers"
 	"github.com/go-chi/chi"
 )
 
-func CreateRouter() *chi.Mux {
-	controller := c.CreateController()
+func CreateRouter(controller controllers.Controller) *chi.Mux {
 	r := chi.NewRouter()
 	sessionCheck := controller.Sessions.Check
 	r.Post("/users", controller.Users.Create)

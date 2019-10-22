@@ -4,7 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/YaroslavRozum/go-boilerplate/lib/runner"
 	"github.com/YaroslavRozum/go-boilerplate/lib/services/sessions"
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/utils"
 )
 
 type SessionsControllers struct {
@@ -12,8 +14,8 @@ type SessionsControllers struct {
 	Create http.HandlerFunc
 }
 
-func CreateSessionsControllers() SessionsControllers {
-	sessionCheck := &sessions.SessionsCheck{}
+func CreateSessionsControllers(s sessions.Services) SessionsControllers {
+	sessionCheck := s.Check()
 
 	return SessionsControllers{
 		Check: func(next http.Handler) http.Handler {
@@ -21,15 +23,15 @@ func CreateSessionsControllers() SessionsControllers {
 				auth := r.Header.Get("Authorization")
 				ctxPayload, err := sessionCheck.Execute(auth)
 				if err != nil {
-					handleError(w, err)
+					utils.HandleError(w, err)
 					return
 				}
 				ctx := context.WithValue(r.Context(), "context", ctxPayload)
 				next.ServeHTTP(w, r.WithContext(ctx))
 			})
 		},
-		Create: NewController(
-			NewServiceRunnerCreator(&sessions.SessionsCreate{}),
+		Create: runner.NewController(
+			runner.NewServiceRunnerCreator(s.Create),
 			defaultPayloadBuilder(sessions.SessionsCreateRequest{}),
 			defaultJsonResponse,
 		),

@@ -1,8 +1,10 @@
-package controllers
+package runner
 
-import (
-	"reflect"
-)
+type ServiceBuilder func() Service
+
+func (sB ServiceBuilder) buildService() Service {
+	return sB()
+}
 
 type Service interface {
 	Validate(interface{}) error
@@ -29,14 +31,13 @@ func (s *ServiceRunner) Run(data interface{}) (interface{}, error) {
 	return response, nil
 }
 
-func NewServiceRunnerCreator(service Service) func(RunnerContext) Runner {
+func NewServiceRunnerCreator(serviceBuilder ServiceBuilder) func(RunnerContext) Runner {
 	return func(ctx RunnerContext) Runner {
-		sE := reflect.TypeOf(service).Elem()
-		newService := reflect.New(sE).Interface().(Service)
-		if serviceWithContext, ok := newService.(ServiceWithContext); ok {
+		service := serviceBuilder.buildService()
+		if serviceWithContext, ok := service.(ServiceWithContext); ok {
 			serviceWithContext.SetContext(ctx)
 		}
-		serviceRunner := &ServiceRunner{newService}
+		serviceRunner := &ServiceRunner{service}
 		return serviceRunner
 	}
 }

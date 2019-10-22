@@ -4,13 +4,10 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 	"github.com/YaroslavRozum/go-boilerplate/lib/models"
-	"github.com/YaroslavRozum/go-boilerplate/lib/services"
-	"github.com/YaroslavRozum/go-boilerplate/settings"
 	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/go-playground/validator.v9"
 )
-
-var validate = services.Validate
 
 type SessionsCreateRequest struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -21,11 +18,15 @@ type SessionsCreateResponse struct {
 	Jwt string `json:"jwt"`
 }
 
-type SessionsCreate struct{}
+type SessionsCreate struct {
+	jwtSecret []byte
+	mappers   models.Mappers
+	validate  *validator.Validate
+}
 
 func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(SessionsCreateRequest)
-	userMapper := models.DefaultUserMapper
+	userMapper := s.mappers.UserMapper
 	user, _ := userMapper.FindOne(sq.Eq{
 		"email": payload.Email,
 	})
@@ -36,7 +37,7 @@ func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 		return nil, &errors.Error{Status: 0, Reason: "Wrong email or password"}
 	}
 
-	claims := &Claims{
+	claims := Claims{
 		Context: Context{
 			Email: user.Email,
 			ID:    user.ID,
@@ -44,7 +45,7 @@ func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 		StandardClaims: jwt.StandardClaims{},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(settings.DefaultSettings.JwtSecret)
+	tokenString, err := token.SignedString(s.jwtSecret)
 
 	if err != nil {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
@@ -54,7 +55,7 @@ func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 }
 
 func (pL *SessionsCreate) Validate(data interface{}) error {
-	err := validate.Struct(data)
+	err := pL.validate.Struct(data)
 	if err != nil {
 		return &errors.Error{Status: 0, Reason: err.Error()}
 	}

@@ -3,11 +3,9 @@ package products
 import (
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 	"github.com/YaroslavRozum/go-boilerplate/lib/models"
-	"github.com/YaroslavRozum/go-boilerplate/lib/services"
 	"github.com/YaroslavRozum/go-boilerplate/lib/services/utils"
+	"gopkg.in/go-playground/validator.v9"
 )
-
-var validate = services.Validate
 
 type ProductsListRequest struct {
 	Search string
@@ -19,13 +17,16 @@ type ProductsListResponse struct {
 	Products []models.Product `json:"products"`
 }
 
-type ProductsList struct{}
+type ProductsList struct {
+	mappers  models.Mappers
+	validate *validator.Validate
+}
 
 func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 	payload := data.(ProductsListRequest)
 	offset := payload.Offset
 	limit := payload.Limit
-	productMapper := models.DefaultProductMapper
+	productMapper := pL.mappers.ProductMapper
 
 	products, err := productMapper.FindAll(nil, limit, offset)
 	if err != nil {
@@ -43,7 +44,7 @@ func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 }
 
 func (pL *ProductsList) Validate(data interface{}) error {
-	err := validate.Struct(data)
+	err := pL.validate.Struct(data)
 	if err != nil {
 		return &errors.Error{Status: 0, Reason: err.Error()}
 	}

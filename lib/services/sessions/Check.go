@@ -6,13 +6,15 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 	"github.com/YaroslavRozum/go-boilerplate/lib/models"
-	"github.com/YaroslavRozum/go-boilerplate/settings"
 	"github.com/dgrijalva/jwt-go"
 )
 
-type SessionsCheck struct{}
+type SessionsCheck struct {
+	jwtSecret []byte
+	mappers   models.Mappers
+}
 
-func (s *SessionsCheck) Execute(auth string) (*Context, error) {
+func (s *SessionsCheck) Execute(auth string) (Context, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(auth, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -20,25 +22,25 @@ func (s *SessionsCheck) Execute(auth string) (*Context, error) {
 			msg := &errors.Error{Status: 0, Reason: errorMsg}
 			return nil, msg
 		}
-		return settings.DefaultSettings.JwtSecret, nil
+		return s.jwtSecret, nil
 	})
 	if err != nil {
-		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+		return Context{}, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
 	ctx := claims.Context
-	userMapper := models.DefaultUserMapper
+	userMapper := s.mappers.UserMapper
 	user, err := userMapper.FindOne(sq.Eq{
 		"id":    ctx.ID,
 		"email": ctx.Email,
 	})
 	if err != nil {
-		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+		return Context{}, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
 	if user.ID != ctx.ID && user.Email != ctx.Email {
-		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+		return Context{}, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
 	if token == nil || !token.Valid {
-		return nil, &errors.Error{Status: 0, Reason: "Unauthorized"}
+		return Context{}, &errors.Error{Status: 0, Reason: "Unauthorized"}
 	}
-	return &claims.Context, nil
+	return claims.Context, nil
 }

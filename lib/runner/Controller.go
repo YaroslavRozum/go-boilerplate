@@ -1,7 +1,9 @@
-package controllers
+package runner
 
 import (
 	"net/http"
+
+	"github.com/YaroslavRozum/go-boilerplate/lib/services/utils"
 )
 
 type Runner interface {
@@ -23,14 +25,14 @@ func NewController(cR CreateRunner, plB PayloadBuilder, rsB ResponseBuilder) htt
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		payload, err := plB(r)
 		if err != nil {
-			handleError(w, err)
+			utils.HandleError(w, err)
 			return
 		}
 		ctx := r.Context().Value("context")
 		serviceRunner := cR(ctx)
 		result, err := serviceRunner.Run(payload)
 		if err != nil {
-			handleError(w, err)
+			utils.HandleError(w, err)
 			return
 		}
 		rsB(w, result)

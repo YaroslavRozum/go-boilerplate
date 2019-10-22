@@ -6,6 +6,7 @@ import (
 	"reflect"
 
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
+	"github.com/YaroslavRozum/go-boilerplate/lib/runner"
 )
 
 type response struct {
@@ -23,42 +24,31 @@ func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	encoder.Encode(res)
 }
 
-func defaultPayloadBuilder(payloadStruct interface{}) PayloadBuilder {
+func defaultPayloadBuilder(payloadStruct interface{}) runner.PayloadBuilder {
 	return func(r *http.Request) (interface{}, error) {
 		contentType := r.Header.Get("Content-Type")
 		if contentType != "application/json" {
 			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
 		}
 		decoder := json.NewDecoder(r.Body)
-		plStrctT := reflect.TypeOf(payloadStruct)
-		plStrctKind := plStrctT.Kind()
-		var plStrctEl reflect.Type
-		switch plStrctKind {
+		payloadStrctT := reflect.TypeOf(payloadStruct)
+		payloadStrctKind := payloadStrctT.Kind()
+		var payloadStrctEl reflect.Type
+		switch payloadStrctKind {
 		case reflect.Struct:
-			plStrctEl = plStrctT
+			payloadStrctEl = payloadStrctT
 		case reflect.Ptr:
-			plStrctEl = plStrctT.Elem()
+			payloadStrctEl = payloadStrctT.Elem()
 		}
-		newStruct := reflect.New(plStrctEl)
+		newStruct := reflect.New(payloadStrctEl)
 		newStructIface := newStruct.Interface()
 		err := decoder.Decode(newStructIface)
 		if err != nil {
 			return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
 		}
-		if plStrctKind == reflect.Struct {
+		if payloadStrctKind == reflect.Struct {
 			return newStruct.Elem().Interface(), nil
 		}
 		return newStructIface, nil
 	}
-}
-
-func handleError(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
-	if _, ok := err.(*errors.Error); !ok {
-		w.Write([]byte(`{"status":0, "reason":"Server Error" }`))
-		return
-	}
-	jsonError, _ := json.Marshal(err)
-	w.Write(jsonError)
-	return
 }
