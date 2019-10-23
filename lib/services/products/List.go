@@ -33,7 +33,7 @@ func (pL *ProductsList) Execute(data interface{}) (interface{}, error) {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}
 
-	responseData := []models.Product{}
+	responseData := make([]models.Product, 0, len(products))
 
 	for _, product := range products {
 		productToAppend := utils.DumpProduct(product)

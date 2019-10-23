@@ -16,7 +16,7 @@ type UsersListRequest struct {
 }
 
 type UsersListResponse struct {
-	Users []*models.User `json:"users"`
+	Users []models.User `json:"users"`
 }
 
 type UsersList struct {
@@ -41,11 +41,11 @@ func (uL *UsersList) Execute(data interface{}) (interface{}, error) {
 		return nil, &errors.Error{Status: 0, Reason: err.Error()}
 	}
 
-	responseData := []*models.User{}
+	responseData := make([]models.User, 0, len(users))
 
 	for _, user := range users {
 		userToAppend := utils.DumpUser(user)
-		responseData = append(responseData, &userToAppend)
+		responseData = append(responseData, userToAppend)
 	}
 
 	return UsersListResponse{responseData}, nil
