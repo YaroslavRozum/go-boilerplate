@@ -24,31 +24,29 @@ func defaultJsonResponse(w http.ResponseWriter, data interface{}) {
 	encoder.Encode(res)
 }
 
-func defaultPayloadBuilder(payloadStruct interface{}) runner.PayloadBuilder {
+type payloadCreator func() interface{}
+
+func defaultPayloadBuilder(createPayload payloadCreator) runner.PayloadBuilder {
 	return func(r *http.Request) (interface{}, error) {
 		contentType := r.Header.Get("Content-Type")
 		if contentType != "application/json" {
 			return nil, &errors.Error{Status: 0, Reason: "NOT_JSON"}
 		}
 		decoder := json.NewDecoder(r.Body)
-		payloadStrctT := reflect.TypeOf(payloadStruct)
-		payloadStrctKind := payloadStrctT.Kind()
-		var payloadStrctEl reflect.Type
-		switch payloadStrctKind {
-		case reflect.Struct:
-			payloadStrctEl = payloadStrctT
-		case reflect.Ptr:
-			payloadStrctEl = payloadStrctT.Elem()
+		payload := createPayload()
+		var err error
+		payloadValue := reflect.ValueOf(payload)
+		if payloadValue.Type().Kind() == reflect.Struct {
+			vp := reflect.New(payloadValue.Type())
+			vp.Elem().Set(payloadValue)
+			err = decoder.Decode(vp.Interface())
+			payload = vp.Elem().Interface()
+		} else {
+			err = decoder.Decode(payload)
 		}
-		newStruct := reflect.New(payloadStrctEl)
-		newStructIface := newStruct.Interface()
-		err := decoder.Decode(newStructIface)
 		if err != nil {
 			return nil, &errors.Error{Status: 0, Reason: "WRONG_PAYLOAD"}
 		}
-		if payloadStrctKind == reflect.Struct {
-			return newStruct.Elem().Interface(), nil
-		}
-		return newStructIface, nil
+		return payload, nil
 	}
 }

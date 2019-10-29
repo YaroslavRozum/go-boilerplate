@@ -1,6 +1,8 @@
 package sessions
 
 import (
+	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/YaroslavRozum/go-boilerplate/lib/errors"
 	"github.com/YaroslavRozum/go-boilerplate/lib/models"
@@ -12,6 +14,10 @@ import (
 type SessionsCreateRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
+}
+
+func NewSessionsCreateRequestToInterface() interface{} {
+	return SessionsCreateRequest{}
 }
 
 type SessionsCreateResponse struct {
@@ -26,6 +32,7 @@ type SessionsCreate struct {
 
 func (s *SessionsCreate) Execute(data interface{}) (interface{}, error) {
 	payload := data.(SessionsCreateRequest)
+	fmt.Println(payload)
 	userMapper := s.mappers.UserMapper
 	user, _ := userMapper.FindOne(sq.Eq{
 		"email": payload.Email,

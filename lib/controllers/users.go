@@ -32,7 +32,7 @@ func CreateUsersControllers(u users.Services) UsersControllers {
 		),
 		Create: runner.NewController(
 			runner.NewServiceRunnerCreator(u.Create),
-			defaultPayloadBuilder(users.UsersCreateRequest{}),
+			defaultPayloadBuilder(users.NewUsersCreateRequestToInterface),
 			defaultJsonResponse,
 		),
 	}

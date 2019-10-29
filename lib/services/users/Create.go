@@ -18,6 +18,10 @@ type UsersCreateRequest struct {
 	ConfirmPassword string `json:"confirmPassword" validate:"eqfield=Password"`
 }
 
+func NewUsersCreateRequestToInterface() interface{} {
+	return UsersCreateRequest{}
+}
+
 type UsersCreateResponse struct {
 	User models.User `json:"user"`
 }

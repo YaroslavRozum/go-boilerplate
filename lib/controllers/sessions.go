@@ -32,7 +32,7 @@ func CreateSessionsControllers(s sessions.Services) SessionsControllers {
 		},
 		Create: runner.NewController(
 			runner.NewServiceRunnerCreator(s.Create),
-			defaultPayloadBuilder(sessions.SessionsCreateRequest{}),
+			defaultPayloadBuilder(sessions.NewSessionsCreateRequestToInterface),
 			defaultJsonResponse,
 		),
 	}
