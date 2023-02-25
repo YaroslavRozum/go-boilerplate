@@ -14,6 +14,8 @@ require (
 	github.com/lib/pq v1.2.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pressly/goose v2.6.0+incompatible
-	golang.org/x/crypto v0.0.0-20190926180335-cea2066c6411
+	golang.org/x/crypto v0.1.0
+	google.golang.org/appengine v1.6.7 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 	gopkg.in/go-playground/validator.v9 v9.29.1
 )
